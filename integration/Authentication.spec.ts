@@ -47,7 +47,7 @@ function buildSigner(): RawSigner {
 async function authenticate(args: { address: string, sessionManager: SessionManager, authenticator: Authenticator, signer: RawSigner }): Promise<AuthenticatedUser> {
     const { address, sessionManager, authenticator, signer } = args;
 
-    const session = sessionManager.createNewSession(address);
+    const session = sessionManager.createNewSession([ address ]);
     const signedOn = DateTime.now();
     const typedSignature = await signer.signRaw({
         signerId: address,
@@ -56,13 +56,15 @@ async function authenticate(args: { address: string, sessionManager: SessionMana
         signedOn,
         attributes: [ session.id ],
     });
-    const signature: SessionSignature = {
-        signature: typedSignature.signature,
-        signedOn,
-        type: "POLKADOT",
+    const signatures: Record<string, SessionSignature> = {
+        [ address ]: {
+            signature: typedSignature.signature,
+            signedOn,
+            type: "POLKADOT",
+        }
     };
-    const signedSession = await sessionManager.signedSessionOrThrow(session, signature);
+    const signedSession = await sessionManager.signedSessionOrThrow(session, signatures);
 
-    const token = await authenticator.createToken(signedSession, DateTime.now());
-    return authenticator.ensureAuthenticatedUserOrThrow(token.value);
+    const tokens = await authenticator.createTokens(signedSession, DateTime.now());
+    return authenticator.ensureAuthenticatedUserOrThrow(tokens[address].value);
 }

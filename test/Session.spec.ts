@@ -10,10 +10,10 @@ describe("SessionManager", () => {
     it("creates a new session", () => {
         const sessionManager = buildSessionManager();
 
-        const session = sessionManager.createNewSession(polkadotAddress);
+        const session = sessionManager.createNewSession([ polkadotAddress ]);
 
         expect(session.id).toBeDefined();
-        expect(session.address).toBe(polkadotAddress);
+        expect(session.addresses[0]).toBe(polkadotAddress);
         expect(session.createdOn).toBeDefined();
     })
 
@@ -60,22 +60,24 @@ async function testSignedSessionOrThrow(signatureType: SignatureType, address: s
         POLKADOT: undefined,
     };
     expected[signatureType] = {
-        address: polkadotAddress,
+        address,
         signature: validSignature ? expectedSignature : "",
     };
-    const { session, sessionManager } = buildSession(polkadotAddress, expected);
-    const signature: SessionSignature = {
-        signature: expectedSignature,
-        signedOn: DateTime.now(),
-        type: signatureType,
+    const { session, sessionManager } = buildSession(address, expected);
+    const signatures: Record<string, SessionSignature> = {
+        [address]: {
+            signature: expectedSignature,
+            signedOn: DateTime.now(),
+            type: signatureType,
+        }
     };
 
     if(validSignature) {
-        const signedSession = await sessionManager.signedSessionOrThrow(session, signature);
+        const signedSession = await sessionManager.signedSessionOrThrow(session, signatures);
         expect(signedSession.session).toBe(session);
-        expect(signedSession.signature).toBe(signature);
+        expect(signedSession.signatures).toBe(signatures);
     } else {
-        await expectAsync(sessionManager.signedSessionOrThrow(session, signature)).toBeRejectedWithError(Error, "Invalid signature");
+        await expectAsync(sessionManager.signedSessionOrThrow(session, signatures)).toBeRejectedWithError(Error, "Invalid signature");
     }
 }
 
@@ -98,7 +100,7 @@ function buildSession(address: string, expectedSignatures: Record<SignatureType,
 } {
     const signatureServices = mockSignatureServices();
     const sessionManager = buildSessionManagerWithMocks(signatureServices);
-    const session = sessionManager.createNewSession(address);
+    const session = sessionManager.createNewSession([ address ]);
     if(expectedSignatures && expectedSignatures.ETHEREUM) {
         const expected = {
             ...expectedSignatures.ETHEREUM,
