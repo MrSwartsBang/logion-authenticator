@@ -16,8 +16,16 @@ export interface Token {
 
 export class Authenticator {
 
-    async createToken(signedSession: SignedSession, issuedAt: DateTime): Promise<Token> {
-        return this._createToken(signedSession.session.address, issuedAt);
+    async createTokens(signedSession: SignedSession, issuedAt: DateTime): Promise<Record<string, Token>> {
+        return this._createTokens(Object.keys(signedSession.signatures), issuedAt);
+    }
+
+    private async _createTokens(addresses: string[], issuedAt: DateTime): Promise<Record<string, Token>> {
+        const tokens: Record<string, Token> = {};
+        for(const address of addresses) {
+            tokens[address] = await this._createToken(address, issuedAt);
+        }
+        return tokens;
     }
 
     private async _createToken(address: string, issuedAt: DateTime): Promise<Token> {

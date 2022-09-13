@@ -11,15 +11,20 @@ const ALICE_TOKEN = "eyJhbGciOiJFZERTQSJ9.eyJpYXQiOjE2MjM2NzQwOTksImV4cCI6MTgyMz
 const USER_ADDRESS = "5H4MvAsobfZ6bBCDyj5dsrWYLrA8HrRzaqa9p61UXtxMhSCY"
 const TTL = 100 * 365 * 24 * 3600; // 100 years
 
-describe('AuthenticationService createToken()', () => {
+describe('Authenticator', () => {
 
     it('generates a token for user', async () => {
         const authenticationService = new Authenticator(buildConfig());
         const signedSession = new Mock<SignedSession>();
-        signedSession.setup(instance => instance.session.address).returns(USER_ADDRESS);
-        const actual = await authenticationService.createToken(signedSession.object(), DateTime.fromSeconds(1631217611));
-        expect(actual.value).toBe(USER_TOKEN);
-        expect(actual.expiredOn.toSeconds()).toBe(DateTime.fromSeconds(1631217611 + TTL).toSeconds());
+        signedSession.setup(instance => instance.signatures).returns({
+            [ USER_ADDRESS ]: {
+                signature: "0x2c88db66ecf845896e1ba4c9fd02ebcb5ab5b84007b45edca6f0836007763c3fb1239824f07372dd41696e1f6558a700cd2c1a7b15fdb06e2041dd3b9878b988",
+                signedOn: DateTime.now(),
+                type: "POLKADOT"
+        }});
+        const actual = await authenticationService.createTokens(signedSession.object(), DateTime.fromSeconds(1631217611));
+        expect(actual[USER_ADDRESS].value).toBe(USER_TOKEN);
+        expect(actual[USER_ADDRESS].expiredOn.toSeconds()).toBe(DateTime.fromSeconds(1631217611 + TTL).toSeconds());
     })
 
     it('authenticates user based on token', async () => {

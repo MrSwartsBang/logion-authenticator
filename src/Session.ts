@@ -6,7 +6,7 @@ import { SignatureType } from "./Signature";
 
 export interface Session {
     readonly id: string;
-    readonly address: string;
+    readonly addresses: string[];
     readonly createdOn: DateTime;
 }
 
@@ -18,38 +18,42 @@ export interface SessionSignature {
 
 export interface SignedSession {
     session: Session;
-    signature: SessionSignature;
+    signatures: Record<string, SessionSignature>;
 }
 
 export class SessionManager {
 
-    createNewSession(address: string): Session {
+    createNewSession(addresses: string[]): Session {
         const id = uuid();
         const createdOn = DateTime.now();
         return {
             id,
-            address,
+            addresses,
             createdOn
         };
     }
 
-    async signedSessionOrThrow(session: Session, signature: SessionSignature): Promise<SignedSession> {
-        const signatureService = this.config.signatureServices[signature.type];
-        if (!await signatureService.verify({
-            signature: signature.signature,
-            address: session.address,
-            resource: "authentication",
-            operation: "login",
-            timestamp: this.normalize(signature.signedOn),
-            attributes: [ session.id ]
-        })) {
-            throw this.config.errorFactory.unauthorized("Invalid signature");
-        } else {
-            return {
-                session,
-                signature
-            };
+    async signedSessionOrThrow(session: Session, signatures: Record<string, SessionSignature>): Promise<SignedSession> {
+        for(const address of Object.keys(signatures)) {
+            const signature = signatures[address];
+            const signatureService = this.config.signatureServices[signature.type];
+            if (!await signatureService.verify({
+                address,
+                signature: signature.signature,
+                resource: "authentication",
+                operation: "login",
+                timestamp: this.normalize(signature.signedOn),
+                attributes: [ session.id ]
+            })) {
+                throw this.config.errorFactory.unauthorized("Invalid signature");
+            } else {
+                
+            }
         }
+        return {
+            session,
+            signatures
+        };
     }
 
     private normalize(dateTime: DateTime): string {
