@@ -13,7 +13,7 @@ export interface VerifyParams {
     resource: string;
     operation: string;
     timestamp: string;
-    attributes: any[];
+    attributes: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 export interface VerifyFunctionParams {
@@ -61,7 +61,7 @@ export class SignatureService {
         }
     }
 
-    private pushOrExpand(allAttributes: any[], attribute: any) {
+    private pushOrExpand(allAttributes: any[], attribute: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
         if (Array.isArray(attribute)) {
             attribute.forEach(subAttribute => this.pushOrExpand(allAttributes, subAttribute));
         } else {
@@ -93,18 +93,22 @@ export class EthereumSignatureService extends SignatureService {
         const { message, signature, address } = params;
         // sha3 must be applied when using Polkadot extension MetaMask compatibility layer
         // @see https://github.com/polkadot-js/extension/blob/master/packages/extension-compat-metamask/src/bundle.ts#L80
-        const digest = sha3(toHex(message))!;
-        const recoveredAddress = recoverAddress(digest, signature);
-        return Promise.resolve(recoveredAddress.toLowerCase() === address.toLowerCase());
+        const digest = sha3(toHex(message));
+        if(digest) {
+            const recoveredAddress = recoverAddress(digest, signature);
+            return Promise.resolve(recoveredAddress.toLowerCase() === address.toLowerCase());
+        } else {
+            throw new Error("Unable to digest message");
+        }
     }
 }
 
-function sha256(attributes: any[]): string {
+function sha256(attributes: any[]): string { // eslint-disable-line @typescript-eslint/no-explicit-any
     return hash("sha256", attributes);
 }
 
-function hash(algorithm: string, attributes: any[]): string {
-    var hash = crypto.createHash(algorithm);
+function hash(algorithm: string, attributes: any[]): string { // eslint-disable-line @typescript-eslint/no-explicit-any
+    const hash = crypto.createHash(algorithm);
     attributes.forEach(attribute => hash.update(Buffer.from(attribute.toString(), 'utf8')));
     return hash.digest('base64');
 }
