@@ -46,8 +46,6 @@ export class SessionManager {
                 attributes: [ session.id ]
             })) {
                 throw this.config.errorFactory.unauthorized("Invalid signature");
-            } else {
-                
             }
         }
         return {
