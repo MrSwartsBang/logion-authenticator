@@ -24,12 +24,15 @@
     "coverage": "nyc yarn run test"
   },
   "dependencies": {
+    "@ethersproject/transactions": "^5.6.2",
     "@logion/node-api": "^0.5.0-2",
     "jose": "^4.8.3",
-    "peer-id": "^0.16.0"
+    "peer-id": "^0.16.0",
+    "web3-utils": "^1.7.4"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
+    "@logion/client": "0.11.0-2",
     "@tsconfig/node16": "^1.0.3",
     "@types/jasmine": "^4.0.3",
     "@types/luxon": "^3.0.0",
