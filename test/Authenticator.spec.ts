@@ -2,7 +2,7 @@ import { DateTime, Duration } from "luxon";
 import { Mock, It } from "moq.ts";
 import PeerId from "peer-id";
 
-import { Authenticator, AuthenticatorConfig, AuthorityService, defaultErrorFactory } from "../src";
+import { Authenticator, AuthenticatorConfig, AuthorityService, defaultErrorFactory, SignedSession } from "../src";
 
 const ALICE = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
 const USER_TOKEN = "eyJhbGciOiJFZERTQSJ9.eyJpYXQiOjE2MzEyMTc2MTEsImV4cCI6NDc4NDgxNzYxMSwiaXNzIjoiMTJEM0tvb1dEQ3VHVTdXWTNWYVdqQlMxRTQ0eDRFbm1UZ0szSFJ4V0ZxWUczZHFYRGZQMSIsInN1YiI6IjVINE12QXNvYmZaNmJCQ0R5ajVkc3JXWUxyQThIclJ6YXFhOXA2MVVYdHhNaFNDWSJ9.pBYUyYxq2I_HZiYyeJ-rc8ANxVgckLyd2Y1Snu685mDK4fSwanb6EHsMAP47iCtzSxhaB5bDu7zDmY-XMAyuAw"
@@ -15,7 +15,9 @@ describe('AuthenticationService createToken()', () => {
 
     it('generates a token for user', async () => {
         const authenticationService = new Authenticator(buildConfig());
-        const actual = await authenticationService.createToken(USER_ADDRESS, DateTime.fromSeconds(1631217611));
+        const signedSession = new Mock<SignedSession>();
+        signedSession.setup(instance => instance.session.address).returns(USER_ADDRESS);
+        const actual = await authenticationService.createToken(signedSession.object(), DateTime.fromSeconds(1631217611));
         expect(actual.value).toBe(USER_TOKEN);
         expect(actual.expiredOn.toSeconds()).toBe(DateTime.fromSeconds(1631217611 + TTL).toSeconds());
     })

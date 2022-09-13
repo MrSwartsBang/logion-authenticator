@@ -1,39 +1,68 @@
 import { buildApi } from "@logion/node-api";
+import { KeyringSigner, RawSigner } from "@logion/client";
+import { Keyring } from "@polkadot/api";
 import { DateTime, Duration } from "luxon";
 import PeerId from "peer-id";
 
-import { Authenticator, defaultErrorFactory, PolkadotAuthorityService } from "../src";
+import { AuthenticatedUser, Authenticator, defaultSetup, SessionManager, SessionSignature, TokenConfig } from "../src";
 
 describe("Authentication", () => {
 
     it("authenticates properly with logion node", async () => {
         const alice = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+        const user = "5DPLBrBxniGbGdFe1Lmdpkt6K3aNjhoNPJrSJ51rwcmhH2Tn";
 
         const api = await buildApi("ws://127.0.0.1:9944");
-        const authorityService = new PolkadotAuthorityService(api);
+        const signer = buildSigner();
 
-        const authenticator = new Authenticator({
+        const tokenConfig: TokenConfig = {
             nodePeerId: PeerId.createFromB58String("12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2"),
             nodeKey: Buffer.from("c12b6d18942f5ee8528c8e2baf4e147b5c5c18710926ea492d09cbd9f6c9f82a", "hex"),
             nodeOwner: alice,
-            authorityService,
-            errorFactory: defaultErrorFactory(),
             jwtTimeToLive: Duration.fromObject({ hour: 1 }),
-        });
+        };
+        const { sessionManager, authenticator } = defaultSetup({ api, tokenConfig });
 
         // Check with regular user
-        const address = "5H4MvAsobfZ6bBCDyj5dsrWYLrA8HrRzaqa9p61UXtxMhSCY";
-        const token = await authenticator.createToken(address, DateTime.now());
-        const authenticatedUser = await authenticator.ensureAuthenticatedUserOrThrow(token.value);
-        expect(authenticatedUser.is(address)).toBe(true);
+        const authenticatedUser = await authenticate({ address: user, authenticator, sessionManager, signer });
+        expect(authenticatedUser.is(user)).toBe(true);
         expect(authenticatedUser.isNodeOwner()).toBe(false);
         expectAsync(authenticatedUser.isLegalOfficer()).toBeResolvedTo(false);
 
         // Check with legal officer
-        const aliceToken = await authenticator.createToken(alice, DateTime.now());
-        const aliceAuthenticatedUser = await authenticator.ensureAuthenticatedUserOrThrow(aliceToken.value);
+        const aliceAuthenticatedUser = await authenticate({ address: alice, authenticator, sessionManager, signer });
         expect(aliceAuthenticatedUser.is(alice)).toBe(true);
         expect(aliceAuthenticatedUser.isNodeOwner()).toBe(true);
         expectAsync(aliceAuthenticatedUser.isLegalOfficer()).toBeResolvedTo(true);
     })
 });
+
+function buildSigner(): RawSigner {
+    const keyring = new Keyring({ type: 'sr25519' });
+    keyring.addFromUri("0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a"); // 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+    keyring.addFromUri("unique chase zone team upset caution match west enter eyebrow limb wrist"); // 5DPLBrBxniGbGdFe1Lmdpkt6K3aNjhoNPJrSJ51rwcmhH2Tn
+    return new KeyringSigner(keyring);
+}
+
+async function authenticate(args: { address: string, sessionManager: SessionManager, authenticator: Authenticator, signer: RawSigner }): Promise<AuthenticatedUser> {
+    const { address, sessionManager, authenticator, signer } = args;
+
+    const session = sessionManager.createNewSession(address);
+    const signedOn = DateTime.now();
+    const typedSignature = await signer.signRaw({
+        signerId: address,
+        resource: 'authentication',
+        operation: 'login',
+        signedOn,
+        attributes: [ session.id ],
+    });
+    const signature: SessionSignature = {
+        signature: typedSignature.signature,
+        signedOn,
+        type: "POLKADOT",
+    };
+    const signedSession = await sessionManager.signedSessionOrThrow(session, signature);
+
+    const token = await authenticator.createToken(signedSession, DateTime.now());
+    return authenticator.ensureAuthenticatedUserOrThrow(token.value);
+}

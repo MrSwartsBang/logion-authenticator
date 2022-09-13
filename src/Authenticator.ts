@@ -7,6 +7,7 @@ import { JWTVerifyResult } from "jose/dist/types/types";
 import { AuthenticatorConfig } from "./Config";
 import { NodeSigner } from "./NodeSigner";
 import { AuthenticatedUser } from "./AuthenticatedUser";
+import { SignedSession } from "./Session";
 
 export interface Token {
     readonly value: string;
@@ -15,7 +16,11 @@ export interface Token {
 
 export class Authenticator {
 
-    async createToken(address: string, issuedAt: DateTime): Promise<Token> {
+    async createToken(signedSession: SignedSession, issuedAt: DateTime): Promise<Token> {
+        return this._createToken(signedSession.session.address, issuedAt);
+    }
+
+    private async _createToken(address: string, issuedAt: DateTime): Promise<Token> {
         const now = Math.floor(issuedAt.toSeconds());
         const expiredOn = now + this.config.jwtTimeToLive.as("seconds");
         const encodedToken = await new SignJWT({})
@@ -69,7 +74,7 @@ export class Authenticator {
 
     async refreshToken(jwtToken: string): Promise<Token> {
         const address = await this.validTokenOrThrow(jwtToken);
-        return await this.createToken(address, DateTime.now());
+        return await this._createToken(address, DateTime.now());
     }
 
     constructor(config: AuthenticatorConfig) {
