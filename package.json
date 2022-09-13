@@ -1,0 +1,53 @@
+{
+  "name": "@logion/authenticator",
+  "version": "0.1.0-1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/logion-network/logion-authenticator.git"
+  },
+  "keywords": [
+    "logion",
+    "authentication"
+  ],
+  "author": {
+    "name": "Logion Team",
+    "email": "info@logion.network",
+    "url": "https://logion.network/"
+  },
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rimraf dist && yarn lint && tsc --project ./tsconfig.json",
+    "lint": "yarn eslint src/**",
+    "test": "jasmine --config=jasmine.json",
+    "integration-test": "docker-compose up -d && jasmine --config=jasmine-integration.json ; docker-compose down",
+    "coverage": "nyc yarn run test"
+  },
+  "dependencies": {
+    "@logion/node-api": "^0.5.0-2",
+    "jose": "^4.8.3",
+    "peer-id": "^0.16.0"
+  },
+  "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
+    "@tsconfig/node16": "^1.0.3",
+    "@types/jasmine": "^4.0.3",
+    "@types/luxon": "^3.0.0",
+    "@types/node": "^18.6.2",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "@typescript-eslint/parser": "latest",
+    "eslint": "^8.20.0",
+    "jasmine": "^4.3.0",
+    "jasmine-spec-reporter": "^7.0.0",
+    "luxon": "^3.0.1",
+    "moq.ts": "^9.0.2",
+    "nyc": "^15.1.0",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "packageManager": "yarn@3.2.3"
+}

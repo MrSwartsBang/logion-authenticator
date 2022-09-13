@@ -1,0 +1,15 @@
+{
+    "extends": "@tsconfig/node16/tsconfig.json",
+    "compilerOptions": {
+        "outDir": "dist",
+        "baseUrl": ".",
+        "inlineSourceMap": true,
+        "declaration": true
+    },
+    "include": [
+        "./src/**/*"
+    ],
+    "exclude": [
+        "dist"
+    ]
+}
