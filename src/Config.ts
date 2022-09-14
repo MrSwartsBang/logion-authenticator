@@ -53,10 +53,7 @@ export function defaultSetup(args: {
     api: LogionNodeApi,
     tokenConfig: TokenConfig,
     errorFactory?: ErrorFactory,
-}): {
-    sessionManager: SessionManager,
-    authenticator: Authenticator,
-} {
+}): AuthenticationSystem {
     const { api, tokenConfig, errorFactory } = args;
 
     const sessionManager = new SessionManager({
@@ -75,4 +72,9 @@ export function defaultSetup(args: {
         sessionManager,
         authenticator,
     }
+}
+
+export interface AuthenticationSystem {
+    readonly sessionManager: SessionManager;
+    readonly authenticator: Authenticator;
 }
