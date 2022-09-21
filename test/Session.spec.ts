@@ -4,6 +4,7 @@ import { defaultErrorFactory, EthereumSignatureService, PolkadotSignatureService
 
 const polkadotAddress = "5DPLBrBxniGbGdFe1Lmdpkt6K3aNjhoNPJrSJ51rwcmhH2Tn";
 const ethereumAddress = "0x6ef154673a6379b2CDEDeD6aF1c0d705c3c8272a";
+const crossmintEthereumAddress = "0xb21edd3dc671484F34075B038a68A76F6362F980";
 
 describe("SessionManager", () => {
 
@@ -32,6 +33,14 @@ describe("SessionManager", () => {
     it("throws with invalid Ethereum signature", async () => {
         await testSignedSessionOrThrow("ETHEREUM", ethereumAddress, false);
     })
+
+    it("provides signed session with valid Crossmint signature", async () => {
+        await testSignedSessionOrThrow("CROSSMINT_ETHEREUM", crossmintEthereumAddress, true);
+    })
+
+    it("throws with invalid Crossmint signature", async () => {
+        await testSignedSessionOrThrow("CROSSMINT_ETHEREUM", crossmintEthereumAddress, false);
+    })
 })
 
 function buildSessionManager(): SessionManager {
@@ -43,6 +52,7 @@ function mockSignatureServices(): Record<SignatureType, Mock<SignatureService>> 
     return {
         ETHEREUM: new Mock<EthereumSignatureService>(),
         POLKADOT: new Mock<PolkadotSignatureService>(),
+        CROSSMINT_ETHEREUM: new Mock<PolkadotSignatureService>(),
     };
 }
 
@@ -50,6 +60,7 @@ function buildSessionManagerWithMocks(signatureServices: Record<SignatureType, M
     return new SessionManager({ errorFactory: defaultErrorFactory(), signatureServices: {
         ETHEREUM: signatureServices.ETHEREUM.object(),
         POLKADOT: signatureServices.POLKADOT.object(),
+        CROSSMINT_ETHEREUM: signatureServices.CROSSMINT_ETHEREUM.object(),
     } });
 }
 
@@ -58,6 +69,7 @@ async function testSignedSessionOrThrow(signatureType: SignatureType, address: s
     const expected: Record<SignatureType, ExpectedSignatureServiceVerify | undefined> = {
         ETHEREUM: undefined,
         POLKADOT: undefined,
+        CROSSMINT_ETHEREUM: undefined,
     };
     expected[signatureType] = {
         address,
@@ -116,6 +128,14 @@ function buildSession(address: string, expectedSignatures: Record<SignatureType,
         };
         signatureServices.POLKADOT.setup(instance => instance.verify(It.Is<VerifyParams>(args => match(args, expected)))).returnsAsync(true);
         signatureServices.POLKADOT.setup(instance => instance.verify(It.Is<VerifyParams>(args => !match(args, expected)))).returnsAsync(false);
+    }
+    if(expectedSignatures && expectedSignatures.CROSSMINT_ETHEREUM) {
+        const expected = {
+            ...expectedSignatures.CROSSMINT_ETHEREUM,
+            sessionId: session.id,
+        };
+        signatureServices.CROSSMINT_ETHEREUM.setup(instance => instance.verify(It.Is<VerifyParams>(args => match(args, expected)))).returnsAsync(true);
+        signatureServices.CROSSMINT_ETHEREUM.setup(instance => instance.verify(It.Is<VerifyParams>(args => !match(args, expected)))).returnsAsync(false);
     }
     return { session, sessionManager };
 }

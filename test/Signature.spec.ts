@@ -1,5 +1,5 @@
 import { It, Mock } from "moq.ts";
-import { EthereumSignatureService, PolkadotSignatureService, SignatureService, VerifyFunction, VerifyFunctionParams } from "../src";
+import { CrossmintSignatureService, EthereumSignatureService, PolkadotSignatureService, SignatureService, VerifyFunction, VerifyFunctionParams } from "../src";
 
 describe('SignatureService', () => {
 
@@ -126,6 +126,33 @@ describe("PolkadotSignatureService", () => {
         expect(await signatureService.verify({
             ...params,
             signature: "0x2c88db66ecf845896e1ba4c9fd02ebcb5ab5b84007b45edca6f0836007763c3fb1239824f07372dd41696e1f6558a700cd2c1a7b15fdb06e2041dd3b9878b988",
+        })).toBeTrue();
+    })
+
+    it("fails to verify invalid signature", async () => {
+        expect(await signatureService.verify({
+            ...params,
+            signature: "0x8807227a68aecb8012994fa6197b36ffa50fe8510edb6ce3f78073deed022da05c272ec6f330f67b1fe6729eb3b66129daa506c18e8ab5eec96b8420711150b61c",
+        })).toBeFalse();
+    })
+});
+
+describe("CrossmintSignatureService", () => {
+
+    const params = {
+        address: "0xb21edd3dc671484F34075B038a68A76F6362F980",
+        resource: "authentication",
+        operation: "login",
+        timestamp: "2022-09-21T16:31:38.464+02:00",
+        attributes: [ "2afe2730-08ad-4409-8ea4-265ea28a699b" ]
+    };
+
+    const signatureService = new CrossmintSignatureService();
+
+    it("verifies valid signature", async () => {
+        expect(await signatureService.verify({
+            ...params,
+            signature: "0x4ce607efd5f846bcb3a5e09393c78f9444f82b846db8350040180f007434fc0d721c82eee2e6d61e9631b4948daa398113c4177f775b8a3cb0fe95ade4cedebb1c",
         })).toBeTrue();
     })
 

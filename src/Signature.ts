@@ -4,8 +4,9 @@ import { signatureVerify } from "@polkadot/util-crypto";
 import { waitReady } from "@polkadot/wasm-crypto";
 import crypto from 'crypto';
 import { sha3 } from "web3-utils";
+import { ethers } from "ethers";
 
-export type SignatureType = "ETHEREUM" | "POLKADOT";
+export type SignatureType = "ETHEREUM" | "POLKADOT" | "CROSSMINT_ETHEREUM";
 
 export interface VerifyParams {
     signature: string;
@@ -111,4 +112,20 @@ function hash(algorithm: string, attributes: any[]): string { // eslint-disable-
     const hash = crypto.createHash(algorithm);
     attributes.forEach(attribute => hash.update(Buffer.from(attribute.toString(), 'utf8')));
     return hash.digest('base64');
+}
+
+export class CrossmintSignatureService extends SignatureService {
+
+    constructor() {
+        super(CrossmintSignatureService.verify);
+    }
+
+    private static async verify(params: VerifyFunctionParams): Promise<boolean> {
+        const { message, signature, address } = params;
+
+        const hexMessage = toHex(message);
+        const digest = ethers.utils.hashMessage(hexMessage);
+        const recoveredAddress = recoverAddress(digest, signature);
+        return Promise.resolve(recoveredAddress.toLowerCase() === address.toLowerCase());
+    }
 }
