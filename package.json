@@ -1,6 +1,6 @@
 {
   "name": "@logion/authenticator",
-  "version": "0.2.2-2",
+  "version": "0.2.2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/logion-network/logion-authenticator.git"
@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@ethersproject/transactions": "^5.6.2",
-    "@logion/node-api": "^0.7.0-3",
+    "@logion/node-api": "^0.7.0",
     "@types/luxon": "^3.0.0",
     "ethers": "^5.7.1",
     "jose": "^4.8.3",
