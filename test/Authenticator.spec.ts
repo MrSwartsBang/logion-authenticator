@@ -19,7 +19,7 @@ describe('Authenticator', () => {
         signedSession.setup(instance => instance.signatures).returns({
             [ USER_ADDRESS ]: {
                 signature: "0x2c88db66ecf845896e1ba4c9fd02ebcb5ab5b84007b45edca6f0836007763c3fb1239824f07372dd41696e1f6558a700cd2c1a7b15fdb06e2041dd3b9878b988",
-                signedOn: DateTime.now(),
+                signedOn: DateTime.now().toISO(),
                 type: "POLKADOT"
         }});
         const actual = await authenticationService.createTokens(signedSession.object(), DateTime.fromSeconds(1631217611));

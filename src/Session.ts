@@ -13,7 +13,7 @@ export interface Session {
 export interface SessionSignature {
     readonly signature: string;
     readonly type: SignatureType;
-    readonly signedOn: DateTime;
+    readonly signedOn: string;
 }
 
 export interface SignedSession {
@@ -42,7 +42,7 @@ export class SessionManager {
                 signature: signature.signature,
                 resource: "authentication",
                 operation: "login",
-                timestamp: this.normalize(signature.signedOn),
+                timestamp: signature.signedOn,
                 attributes: [ session.id ]
             })) {
                 throw this.config.errorFactory.unauthorized("Invalid signature");
@@ -52,15 +52,6 @@ export class SessionManager {
             session,
             signatures
         };
-    }
-
-    private normalize(dateTime: DateTime): string {
-        const signedOn = dateTime.toISO();
-        if(signedOn.endsWith('Z')) {
-            return signedOn.substring(0, signedOn.length - 1);
-        } else {
-            return signedOn;
-        }
     }
 
     constructor(config: SessionManagerConfig) {
