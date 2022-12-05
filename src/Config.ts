@@ -25,6 +25,7 @@ export interface ErrorFactory {
 export interface AuthorityService {
     isLegalOfficerNode(peerId: PeerId): Promise<boolean>;
     isLegalOfficer(address: string): Promise<boolean>;
+    isLegalOfficerOnNode(address: string, nodeId: PeerId): Promise<boolean>;
 }
 
 export function defaultErrorFactory(): ErrorFactory {

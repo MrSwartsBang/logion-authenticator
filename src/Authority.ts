@@ -17,8 +17,34 @@ export class PolkadotAuthorityService implements AuthorityService {
         return entry.isSome;
     }
 
+    async isLegalOfficerOnNode(address: string, nodeId: PeerId): Promise<boolean> {
+        const entry = await this.api.query.loAuthorityList.legalOfficerSet(address);
+        if(!entry.isSome) {
+            return false;
+        } else {
+            const legalOfficer = entry.unwrap();
+            if(legalOfficer.isHost && legalOfficer.asHost.nodeId.isSome) {
+                return this.toHex(nodeId) === legalOfficer.asHost.nodeId.unwrap().toHex();
+            } else if(legalOfficer.isGuest) {
+                const hostAddress = legalOfficer.asGuest.toHuman();
+                const host = await this.api.query.loAuthorityList.legalOfficerSet(hostAddress);
+                if(host.isSome && host.unwrap().isHost && host.unwrap().asHost.nodeId.isSome) {
+                    return nodeId.toHexString() === host.unwrap().asHost.nodeId.toHex();
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+    }
+
+    private toHex(peerId: PeerId): string {
+        return `0x${ peerId.toHexString() }`;
+    }
+
     async isLegalOfficerNode(peerId: PeerId): Promise<boolean> {
-        const hexPeerId = peerId.toHexString();
+        const hexPeerId = this.toHex(peerId);
         const legalOfficerNodes = await this.api.query.loAuthorityList.legalOfficerNodes();
         const wellKnowNodes = await this.api.query.nodeAuthorization.wellKnownNodes();
         return this.isInSet(hexPeerId, legalOfficerNodes) || this.isInSet(hexPeerId, wellKnowNodes);
@@ -26,7 +52,7 @@ export class PolkadotAuthorityService implements AuthorityService {
 
     private isInSet(hexPeerId: string, set: Set<OpaquePeerId>): boolean {
         for (const opaquePeerId of set) {
-            if (opaquePeerId.toHex() === `0x${ hexPeerId }`) {
+            if (opaquePeerId.toHex() === hexPeerId) {
                 return true;
             }
         }
