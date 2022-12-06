@@ -73,10 +73,12 @@ export function defaultSetup(args: {
     return {
         sessionManager,
         authenticator,
+        authorityService,
     }
 }
 
 export interface AuthenticationSystem {
     readonly sessionManager: SessionManager;
     readonly authenticator: Authenticator;
+    readonly authorityService: AuthorityService;
 }

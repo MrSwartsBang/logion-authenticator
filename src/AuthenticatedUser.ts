@@ -35,6 +35,13 @@ export class AuthenticatedUser {
         return this;
     }
 
+    async requireLegalOfficerOnNode(message?: string): Promise<AuthenticatedUser> {
+        if (! await this.authorityService.isLegalOfficerOnNode(this.address)) {
+            throw this.errorFactory.unauthorized(message || "Authenticated User is not Legal Officer on this node.");
+        }
+        return this;
+    }
+
     isOneOf(addresses: (string | undefined | null)[]): boolean {
         return addresses.some(address => this.is(address));
     }
