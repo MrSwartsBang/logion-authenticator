@@ -25,42 +25,42 @@ describe("PolkadotAuthorityService", () => {
 
     it("succeeds with legal officer", async () => {
         const polkadotService = mockPolkadotServiceWithLegalOfficer(LEGAL_OFFICER_NODES, []);
-        const authorityService = new PolkadotAuthorityService(polkadotService);
+        const authorityService = new PolkadotAuthorityService(polkadotService, PeerId.createFromB58String(NODE1));
         expect(await authorityService.isLegalOfficer(ALICE)).toBe(true);
     })
 
     it("fails for a non-legal officer", async () => {
         const polkadotService = mockPolkadotServiceWithLegalOfficer(LEGAL_OFFICER_NODES, []);
-        const authorityService = new PolkadotAuthorityService(polkadotService);
+        const authorityService = new PolkadotAuthorityService(polkadotService, PeerId.createFromB58String(NODE1));
         expect(await authorityService.isLegalOfficer(REGULAR_USER_ADDRESS)).toBe(false);
     })
 
     it("detects a legal officer node", async () => {
         const peerId = PeerId.createFromB58String(NODE1);
         const polkadotService = mockPolkadotServiceWithLegalOfficer(LEGAL_OFFICER_NODES, []);
-        const authorityService = new PolkadotAuthorityService(polkadotService);
+        const authorityService = new PolkadotAuthorityService(polkadotService, PeerId.createFromB58String(NODE1));
         expect(await authorityService.isLegalOfficerNode(peerId)).toBeTrue();
     })
 
     it("does not detect any peer id as legal officer node", async () => {
         const peerId = PeerId.createFromB58String(ANY_NODE);
         const polkadotService = mockPolkadotServiceWithLegalOfficer(LEGAL_OFFICER_NODES, []);
-        const authorityService = new PolkadotAuthorityService(polkadotService);
+        const authorityService = new PolkadotAuthorityService(polkadotService, PeerId.createFromB58String(NODE1));
         expect(await authorityService.isLegalOfficerNode(peerId)).toBeFalse()
     })
 
     it("detects a well-known node", async () => {
         const peerId = PeerId.createFromB58String(NODE1);
         const polkadotService = mockPolkadotServiceWithLegalOfficer({}, Object.values(LEGAL_OFFICER_NODES));
-        const authorityService = new PolkadotAuthorityService(polkadotService);
+        const authorityService = new PolkadotAuthorityService(polkadotService, PeerId.createFromB58String(NODE1));
         expect(await authorityService.isLegalOfficerNode(peerId)).toBeTrue();
     })
 
     it("detects a legal officer of given node", async () => {
         const peerId = PeerId.createFromB58String(NODE1);
         const polkadotService = mockPolkadotServiceWithLegalOfficer(LEGAL_OFFICER_NODES, []);
-        const authorityService = new PolkadotAuthorityService(polkadotService);
-        expect(await authorityService.isLegalOfficerOnNode(ALICE, peerId)).toBeTrue();
+        const authorityService = new PolkadotAuthorityService(polkadotService, peerId);
+        expect(await authorityService.isLegalOfficerOnNode(ALICE)).toBeTrue();
     })
 })
 

@@ -6,30 +6,33 @@ import { AuthorityService } from './Config';
 
 export class PolkadotAuthorityService implements AuthorityService {
 
-    constructor(connectedApi: LogionNodeApi) {
+    constructor(connectedApi: LogionNodeApi, nodeId: PeerId) {
         this.api = connectedApi;
+        this.nodeId = nodeId;
     }
 
     private api: LogionNodeApi;
+
+    private readonly nodeId: PeerId;
 
     async isLegalOfficer(address: string): Promise<boolean> {
         const entry = await this.api.query.loAuthorityList.legalOfficerSet(address);
         return entry.isSome;
     }
 
-    async isLegalOfficerOnNode(address: string, nodeId: PeerId): Promise<boolean> {
+    async isLegalOfficerOnNode(address: string): Promise<boolean> {
         const entry = await this.api.query.loAuthorityList.legalOfficerSet(address);
         if(!entry.isSome) {
             return false;
         } else {
             const legalOfficer = entry.unwrap();
             if(legalOfficer.isHost && legalOfficer.asHost.nodeId.isSome) {
-                return this.toHex(nodeId) === legalOfficer.asHost.nodeId.unwrap().toHex();
+                return this.toHex(this.nodeId) === legalOfficer.asHost.nodeId.unwrap().toHex();
             } else if(legalOfficer.isGuest) {
                 const hostAddress = legalOfficer.asGuest.toHuman();
                 const host = await this.api.query.loAuthorityList.legalOfficerSet(hostAddress);
                 if(host.isSome && host.unwrap().isHost && host.unwrap().asHost.nodeId.isSome) {
-                    return nodeId.toHexString() === host.unwrap().asHost.nodeId.toHex();
+                    return this.nodeId.toHexString() === host.unwrap().asHost.nodeId.toHex();
                 } else {
                     return false;
                 }
