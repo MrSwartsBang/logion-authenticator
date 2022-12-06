@@ -25,7 +25,7 @@ export interface ErrorFactory {
 export interface AuthorityService {
     isLegalOfficerNode(peerId: PeerId): Promise<boolean>;
     isLegalOfficer(address: string): Promise<boolean>;
-    isLegalOfficerOnNode(address: string, nodeId: PeerId): Promise<boolean>;
+    isLegalOfficerOnNode(address: string): Promise<boolean>;
 }
 
 export function defaultErrorFactory(): ErrorFactory {
@@ -34,8 +34,8 @@ export function defaultErrorFactory(): ErrorFactory {
     };
 }
 
-export function defaultAuthorityService(api: LogionNodeApi): AuthorityService {
-    return new PolkadotAuthorityService(api);
+export function defaultAuthorityService(api: LogionNodeApi, nodeId: PeerId): AuthorityService {
+    return new PolkadotAuthorityService(api, nodeId);
 }
 
 export interface SessionManagerConfig {
@@ -63,7 +63,7 @@ export function defaultSetup(args: {
         signatureServices: defaultSignatureServices(),
     });
 
-    const authorityService = defaultAuthorityService(api);
+    const authorityService = defaultAuthorityService(api, tokenConfig.nodePeerId);
     const authenticator = new Authenticator({
         ...tokenConfig,
         authorityService,
