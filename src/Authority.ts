@@ -29,10 +29,10 @@ export class PolkadotAuthorityService implements AuthorityService {
             if(legalOfficer.isHost && legalOfficer.asHost.nodeId.isSome) {
                 return this.toHex(this.nodeId) === legalOfficer.asHost.nodeId.unwrap().toHex();
             } else if(legalOfficer.isGuest) {
-                const hostAddress = legalOfficer.asGuest.toHuman();
+                const hostAddress = legalOfficer.asGuest;
                 const host = await this.api.query.loAuthorityList.legalOfficerSet(hostAddress);
                 if(host.isSome && host.unwrap().isHost && host.unwrap().asHost.nodeId.isSome) {
-                    return this.nodeId.toHexString() === host.unwrap().asHost.nodeId.toHex();
+                    return this.toHex(this.nodeId) === host.unwrap().asHost.nodeId.unwrap().toHex();
                 } else {
                     return false;
                 }
