@@ -1,10 +1,10 @@
 import { LogionNodeApi } from "@logion/node-api";
 import { Duration } from "luxon";
 import PeerId from "peer-id";
-import { Authenticator } from "./Authenticator";
-import { PolkadotAuthorityService } from "./Authority";
-import { SessionManager } from "./Session";
-import { CrossmintSignatureService, EthereumSignatureService, PolkadotSignatureService, SignatureService, SignatureType } from "./Signature";
+import { Authenticator } from "./Authenticator.js";
+import { PolkadotAuthorityService } from "./Authority.js";
+import { SessionManager } from "./Session.js";
+import { CrossmintSignatureService, EthereumSignatureService, PolkadotSignatureService, SignatureService, SignatureType } from "./Signature.js";
 
 export interface TokenConfig {
     readonly nodeOwner: string;

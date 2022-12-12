@@ -2,7 +2,7 @@ import { DateTime, Duration } from "luxon";
 import { Mock, It } from "moq.ts";
 import PeerId from "peer-id";
 
-import { Authenticator, AuthenticatorConfig, AuthorityService, defaultErrorFactory, SignedSession } from "../src";
+import { Authenticator, AuthenticatorConfig, AuthorityService, defaultErrorFactory, SignedSession } from "../src/index.js";
 
 const ALICE = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
 const USER_TOKEN = "eyJhbGciOiJFZERTQSJ9.eyJpYXQiOjE2MzEyMTc2MTEsImV4cCI6NDc4NDgxNzYxMSwiaXNzIjoiMTJEM0tvb1dEQ3VHVTdXWTNWYVdqQlMxRTQ0eDRFbm1UZ0szSFJ4V0ZxWUczZHFYRGZQMSIsInN1YiI6IjVINE12QXNvYmZaNmJCQ0R5ajVkc3JXWUxyQThIclJ6YXFhOXA2MVVYdHhNaFNDWSJ9.pBYUyYxq2I_HZiYyeJ-rc8ANxVgckLyd2Y1Snu685mDK4fSwanb6EHsMAP47iCtzSxhaB5bDu7zDmY-XMAyuAw"

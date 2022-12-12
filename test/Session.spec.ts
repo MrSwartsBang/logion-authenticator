@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { It, Mock } from "moq.ts";
-import { defaultErrorFactory, EthereumSignatureService, PolkadotSignatureService, Session, SessionManager, SessionSignature, SignatureService, SignatureType, VerifyParams } from "../src";
+import { defaultErrorFactory, EthereumSignatureService, PolkadotSignatureService, Session, SessionManager, SessionSignature, SignatureService, SignatureType, VerifyParams } from "../src/index.js";
 
 const polkadotAddress = "5DPLBrBxniGbGdFe1Lmdpkt6K3aNjhoNPJrSJ51rwcmhH2Tn";
 const ethereumAddress = "0x6ef154673a6379b2CDEDeD6aF1c0d705c3c8272a";

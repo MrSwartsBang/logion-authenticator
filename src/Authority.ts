@@ -2,7 +2,7 @@ import { LogionNodeApi } from '@logion/node-api';
 import { OpaquePeerId } from '@logion/node-api/dist/interfaces/default';
 import PeerId from 'peer-id';
 
-import { AuthorityService } from './Config';
+import { AuthorityService } from './Config.js';
 
 export class PolkadotAuthorityService implements AuthorityService {
 

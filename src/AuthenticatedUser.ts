@@ -1,4 +1,4 @@
-import { AuthorityService, ErrorFactory } from "./Config";
+import { AuthorityService, ErrorFactory } from "./Config.js";
 
 export class AuthenticatedUser {
 

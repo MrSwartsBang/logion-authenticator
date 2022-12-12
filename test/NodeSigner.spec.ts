@@ -1,5 +1,5 @@
 import PeerId from "peer-id";
-import { NodeSigner } from "../src/NodeSigner";
+import { NodeSigner } from "../src/NodeSigner.js";
 
 describe("NodeSigner", () => {
 
