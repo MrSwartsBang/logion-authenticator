@@ -4,7 +4,7 @@ import { Codec } from "@polkadot/types-codec/types";
 import PeerId, { createFromB58String } from "peer-id";
 import { AccountId, OpaquePeerId } from "@logion/node-api/dist/interfaces";
 
-import { PolkadotAuthorityService } from "../src";
+import { PolkadotAuthorityService } from "../src/index.js";
 import { LogionNodeApi } from "@logion/node-api";
 import { PalletLoAuthorityListLegalOfficerData, PalletLoAuthorityListHostData } from "@polkadot/types/lookup";
 

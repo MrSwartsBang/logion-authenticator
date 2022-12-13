@@ -4,10 +4,10 @@ import { KeyObject } from "crypto";
 import { SignJWT, decodeJwt, jwtVerify, JWTPayload } from "jose";
 import { JWTVerifyResult } from "jose/dist/types/types";
 
-import { AuthenticatorConfig } from "./Config";
-import { NodeSigner } from "./NodeSigner";
-import { AuthenticatedUser } from "./AuthenticatedUser";
-import { SignedSession } from "./Session";
+import { AuthenticatorConfig } from "./Config.js";
+import { NodeSigner } from "./NodeSigner.js";
+import { AuthenticatedUser } from "./AuthenticatedUser.js";
+import { SignedSession } from "./Session.js";
 
 export interface Token {
     readonly value: string;

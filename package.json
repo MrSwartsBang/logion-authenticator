@@ -1,6 +1,6 @@
 {
   "name": "@logion/authenticator",
-  "version": "0.3.3-5",
+  "version": "0.3.3-6",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/logion-network/logion-authenticator.git"
@@ -19,7 +19,7 @@
   "scripts": {
     "build": "rimraf dist && yarn lint && tsc --project ./tsconfig.json",
     "lint": "yarn eslint src/**",
-    "test": "jasmine --config=jasmine.json",
+    "test": "NODE_OPTIONS=--loader=ts-node/esm jasmine --config=jasmine.json",
     "integration-test": "docker-compose up -d && jasmine --config=jasmine-integration.json ; docker-compose down",
     "coverage": "nyc yarn run test"
   },
@@ -53,5 +53,6 @@
   "engines": {
     "node": ">=16"
   },
-  "packageManager": "yarn@3.2.3"
+  "packageManager": "yarn@3.2.3",
+  "type": "module"
 }

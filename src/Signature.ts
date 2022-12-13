@@ -1,9 +1,9 @@
 import { recoverAddress } from "@ethersproject/transactions";
-import { toHex } from "@logion/node-api/dist/Codec";
+import { toHex } from "@logion/node-api";
 import { signatureVerify } from "@polkadot/util-crypto";
 import { waitReady } from "@polkadot/wasm-crypto";
 import crypto from 'crypto';
-import { sha3 } from "web3-utils";
+import web3Util from "web3-utils";
 import { ethers } from "ethers";
 
 export type SignatureType = "ETHEREUM" | "POLKADOT" | "CROSSMINT_ETHEREUM";
@@ -94,7 +94,7 @@ export class EthereumSignatureService extends SignatureService {
         const { message, signature, address } = params;
         // sha3 must be applied when using Polkadot extension MetaMask compatibility layer
         // @see https://github.com/polkadot-js/extension/blob/master/packages/extension-compat-metamask/src/bundle.ts#L80
-        const digest = sha3(toHex(message));
+        const digest = web3Util.sha3(toHex(message));
         if(digest) {
             const recoveredAddress = recoverAddress(digest, signature);
             return Promise.resolve(recoveredAddress.toLowerCase() === address.toLowerCase());

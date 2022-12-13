@@ -1,5 +1,5 @@
 import { It, Mock } from "moq.ts";
-import { CrossmintSignatureService, EthereumSignatureService, PolkadotSignatureService, SignatureService, VerifyFunction, VerifyFunctionParams } from "../src";
+import { CrossmintSignatureService, EthereumSignatureService, PolkadotSignatureService, SignatureService, VerifyFunction, VerifyFunctionParams } from "../src/index.js";
 
 describe('SignatureService', () => {
 

@@ -1,5 +1,5 @@
 import { It, Mock } from "moq.ts";
-import { AuthenticatedUser, AuthorityService } from "../src";
+import { AuthenticatedUser, AuthorityService } from "../src/index.js";
 
 const ALICE = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
 const USER_ADDRESS = "5H4MvAsobfZ6bBCDyj5dsrWYLrA8HrRzaqa9p61UXtxMhSCY"

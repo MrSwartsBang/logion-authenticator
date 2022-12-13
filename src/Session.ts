@@ -1,8 +1,8 @@
 import { DateTime } from "luxon";
 import { v4 as uuid } from "uuid";
 
-import { SessionManagerConfig } from "./Config";
-import { SignatureType } from "./Signature";
+import { SessionManagerConfig } from "./Config.js";
+import { SignatureType } from "./Signature.js";
 
 export interface Session {
     readonly id: string;
