@@ -1,12 +1,28 @@
 import { Mock } from "moq.ts";
-import { Option } from "@polkadot/types-codec";
+import { Bytes, Enum, Option, Struct } from "@polkadot/types-codec";
 import { Codec } from "@polkadot/types-codec/types";
+import type { AccountId32 } from '@polkadot/types/interfaces/runtime';
+import type { OpaquePeerId } from '@polkadot/types/interfaces/imOnline';
 import PeerId, { createFromB58String } from "peer-id";
-import { AccountId, OpaquePeerId } from "@logion/node-api/dist/interfaces";
+import { AccountId } from "@logion/node-api/dist/interfaces";
 
 import { PolkadotAuthorityService } from "../src/index.js";
 import { LogionNodeApi } from "@logion/node-api";
-import { PalletLoAuthorityListLegalOfficerData, PalletLoAuthorityListHostData } from "@polkadot/types/lookup";
+
+// Below definitions must be removed once @logion/node-api is switched to ES module packaging
+interface PalletLoAuthorityListLegalOfficerData extends Enum {
+    readonly isHost: boolean;
+    readonly asHost: PalletLoAuthorityListHostData;
+    readonly isGuest: boolean;
+    readonly asGuest: AccountId32;
+    readonly type: 'Host' | 'Guest';
+}
+
+interface PalletLoAuthorityListHostData extends Struct {
+    readonly nodeId: Option<OpaquePeerId>;
+    readonly baseUrl: Option<Bytes>;
+}
+// Above definitions must be removed once @logion/node-api is switched to ES module packaging
 
 const ALICE = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
 const NODE1 = "12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2";
