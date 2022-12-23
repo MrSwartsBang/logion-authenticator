@@ -1,10 +1,10 @@
 import { buildApi } from "@logion/node-api";
-import { KeyringSigner, RawSigner } from "@logion/client";
+import { KeyringSigner, RawSigner, toIsoString } from "@logion/client";
 import { Keyring } from "@polkadot/api";
 import { DateTime, Duration } from "luxon";
 import PeerId from "peer-id";
 
-import { AuthenticatedUser, Authenticator, defaultSetup, SessionManager, SessionSignature, TokenConfig } from "../src";
+import { AuthenticatedUser, Authenticator, defaultSetup, SessionManager, SessionSignature, TokenConfig } from "../src/index.js";
 
 describe("Authentication", () => {
 
@@ -59,7 +59,7 @@ async function authenticate(args: { address: string, sessionManager: SessionMana
     const signatures: Record<string, SessionSignature> = {
         [ address ]: {
             signature: typedSignature.signature,
-            signedOn,
+            signedOn: toIsoString(signedOn),
             type: "POLKADOT",
         }
     };
