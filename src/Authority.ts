@@ -1,5 +1,5 @@
 import { LogionNodeApi } from '@logion/node-api';
-import { OpaquePeerId } from '@logion/node-api/dist/interfaces/default';
+import { OpaquePeerId } from "@logion/node-api/dist/types/interfaces";
 import PeerId from 'peer-id';
 
 import { AuthorityService } from './Config.js';

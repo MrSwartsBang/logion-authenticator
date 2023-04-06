@@ -27,13 +27,13 @@ describe("Authentication", () => {
         const authenticatedUser = await authenticate({ address: user, authenticator, sessionManager, signer });
         expect(authenticatedUser.is(user)).toBe(true);
         expect(authenticatedUser.isNodeOwner()).toBe(false);
-        expectAsync(authenticatedUser.isLegalOfficer()).toBeResolvedTo(false);
+        await expectAsync(authenticatedUser.isLegalOfficer()).toBeResolvedTo(false);
 
         // Check with legal officer
         const aliceAuthenticatedUser = await authenticate({ address: alice, authenticator, sessionManager, signer });
         expect(aliceAuthenticatedUser.is(alice)).toBe(true);
         expect(aliceAuthenticatedUser.isNodeOwner()).toBe(true);
-        expectAsync(aliceAuthenticatedUser.isLegalOfficer()).toBeResolvedTo(true);
+        await expectAsync(aliceAuthenticatedUser.isLegalOfficer()).toBeResolvedTo(true);
     })
 });
 

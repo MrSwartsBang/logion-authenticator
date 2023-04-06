@@ -6,8 +6,9 @@ import { JWTVerifyResult } from "jose/dist/types/types";
 
 import { AuthenticatorConfig } from "./Config.js";
 import { NodeSigner } from "./NodeSigner.js";
-import { AuthenticatedUser } from "./AuthenticatedUser.js";
+import { AuthenticatedUser, Address, AddressType } from "./AuthenticatedUser.js";
 import { SignedSession } from "./Session.js";
+import { SignatureType } from "./Signature.js";
 
 export interface Token {
     readonly value: string;
@@ -17,31 +18,44 @@ export interface Token {
 export class Authenticator {
 
     async createTokens(signedSession: SignedSession, issuedAt: DateTime): Promise<Record<string, Token>> {
-        return this._createTokens(Object.keys(signedSession.signatures), issuedAt);
-    }
-
-    private async _createTokens(addresses: string[], issuedAt: DateTime): Promise<Record<string, Token>> {
         const tokens: Record<string, Token> = {};
-        for(const address of addresses) {
-            tokens[address] = await this._createToken(address, issuedAt);
+        const addresses = Object.keys(signedSession.signatures);
+        for(const addressValue of addresses) {
+            const sessionSignature = signedSession.signatures[addressValue];
+            const address: Address = {
+                type: this.toAddressType(sessionSignature.type),
+                address: addressValue
+            }
+            tokens[addressValue] = await this._createToken(address, issuedAt);
         }
         return tokens;
     }
 
-    private async _createToken(address: string, issuedAt: DateTime): Promise<Token> {
+    private async _createToken(address: Address, issuedAt: DateTime): Promise<Token> {
         const now = Math.floor(issuedAt.toSeconds());
         const expiredOn = now + this.config.jwtTimeToLive.as("seconds");
-        const encodedToken = await new SignJWT({})
+        const payload = {
+            addressType: address.type
+        }
+        const encodedToken = await new SignJWT(payload)
             .setProtectedHeader({ alg: Authenticator.ALGORITHM })
             .setIssuedAt(now)
             .setExpirationTime(expiredOn)
             .setIssuer(this.config.nodePeerId.toB58String())
-            .setSubject(address)
+            .setSubject(address.address)
             .sign(this.privateKey);
         return {
             value: encodedToken,
             expiredOn: DateTime.fromSeconds(expiredOn),
         };
+    }
+
+    private toAddressType(signatureType: SignatureType): AddressType {
+        if (signatureType === "POLKADOT") {
+            return "Polkadot";
+        } else {
+            return "Ethereum";
+        }
     }
 
     async ensureAuthenticatedUserOrThrow(jwtToken: string): Promise<AuthenticatedUser> {
@@ -54,7 +68,7 @@ export class Authenticator {
         );
     }
 
-    private async validTokenOrThrow(jwtToken: string): Promise<string> {
+    private async validTokenOrThrow(jwtToken: string): Promise<Address> {
         let payload: JWTPayload;
         try {
             payload = decodeJwt(jwtToken)
@@ -77,7 +91,11 @@ export class Authenticator {
         if (!address) {
             throw this.config.errorFactory.unauthorized("Unable to find issuer in payload");
         }
-        return address;
+        const type = payload.addressType === "Polkadot" ? "Polkadot" : "Ethereum";
+        return {
+            address,
+            type,
+        }
     }
 
     async refreshToken(jwtToken: string): Promise<Token> {

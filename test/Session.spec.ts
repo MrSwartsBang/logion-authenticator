@@ -79,7 +79,7 @@ async function testSignedSessionOrThrow(signatureType: SignatureType, address: s
     const signatures: Record<string, SessionSignature> = {
         [address]: {
             signature: expectedSignature,
-            signedOn: DateTime.now().toISO(),
+            signedOn: DateTime.now().toISO() || "",
             type: signatureType,
         }
     };
