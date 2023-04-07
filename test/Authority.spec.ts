@@ -2,9 +2,8 @@ import { Mock } from "moq.ts";
 import { Bytes, Enum, Option, Struct } from "@polkadot/types-codec";
 import { Codec } from "@polkadot/types-codec/types";
 import type { AccountId32 } from '@polkadot/types/interfaces/runtime';
-import type { OpaquePeerId } from '@polkadot/types/interfaces/imOnline';
 import PeerId, { createFromB58String } from "peer-id";
-import { AccountId } from "@logion/node-api/dist/interfaces";
+import { AccountId, OpaquePeerId } from "@logion/node-api/dist/types/interfaces";
 
 import { PolkadotAuthorityService } from "../src/index.js";
 import { LogionNodeApi } from "@logion/node-api";

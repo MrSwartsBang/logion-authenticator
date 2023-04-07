@@ -1,25 +1,38 @@
 import { AuthorityService, ErrorFactory } from "./Config.js";
+import { AccountType } from "@logion/node-api";
 
-export class AuthenticatedUser {
+export type AddressType = AccountType;
+
+export interface Address {
+    readonly type: AddressType;
+    readonly address: string;
+}
+
+export class AuthenticatedUser implements Address {
 
     constructor(
-        address: string,
+        address: Address,
         nodeOwner: string,
         authorityService: AuthorityService,
         errorFactory: ErrorFactory,
     ) {
-        this.address = address;
+        this.type = address.type;
+        this.address = address.address;
         this.nodeOwner = nodeOwner;
         this.authorityService = authorityService;
         this.errorFactory = errorFactory;
     }
 
+    isPolkadot(): boolean {
+        return this.type === "Polkadot";
+    }
+
     isNodeOwner(): boolean {
-        return this.nodeOwner === this.address;
+        return this.isPolkadot() && this.nodeOwner === this.address;
     }
 
     async isLegalOfficer(): Promise<boolean> {
-        return await this.authorityService.isLegalOfficer(this.address);
+        return this.isPolkadot() && await this.authorityService.isLegalOfficer(this.address);
     }
 
     is(address: string | undefined | null): boolean {
@@ -36,7 +49,7 @@ export class AuthenticatedUser {
     }
 
     async requireLegalOfficerOnNode(message?: string): Promise<AuthenticatedUser> {
-        if (! await this.authorityService.isLegalOfficerOnNode(this.address)) {
+        if (! (this.isPolkadot() && await this.authorityService.isLegalOfficerOnNode(this.address))) {
             throw this.errorFactory.unauthorized(message || "Authenticated User is not Legal Officer on this node.");
         }
         return this;
@@ -47,6 +60,7 @@ export class AuthenticatedUser {
     }
 
     readonly address: string;
+    readonly type: AddressType;
     private readonly nodeOwner: string;
     private readonly authorityService: AuthorityService;
     private readonly errorFactory: ErrorFactory;
