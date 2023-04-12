@@ -11,6 +11,7 @@ export interface Session {
 }
 
 export interface SessionSignature {
+    readonly address: string;
     readonly signature: string;
     readonly type: SignatureType;
     readonly signedOn: string;
@@ -18,7 +19,7 @@ export interface SessionSignature {
 
 export interface SignedSession {
     session: Session;
-    signatures: Record<string, SessionSignature>;
+    signatures: SessionSignature[];
 }
 
 export class SessionManager {
@@ -33,12 +34,11 @@ export class SessionManager {
         };
     }
 
-    async signedSessionOrThrow(session: Session, signatures: Record<string, SessionSignature>): Promise<SignedSession> {
-        for(const address of Object.keys(signatures)) {
-            const signature = signatures[address];
+    async signedSessionOrThrow(session: Session, signatures: SessionSignature[]): Promise<SignedSession> {
+        for(const signature of signatures) {
             const signatureService = this.config.signatureServices[signature.type];
             if (!await signatureService.verify({
-                address,
+                address: signature.address,
                 signature: signature.signature,
                 resource: "authentication",
                 operation: "login",

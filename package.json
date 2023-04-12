@@ -1,6 +1,6 @@
 {
   "name": "@logion/authenticator",
-  "version": "0.5.0-4",
+  "version": "0.5.0-5",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/logion-network/logion-authenticator.git"

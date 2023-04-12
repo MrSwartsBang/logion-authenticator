@@ -76,13 +76,13 @@ async function testSignedSessionOrThrow(signatureType: SignatureType, address: s
         signature: validSignature ? expectedSignature : "",
     };
     const { session, sessionManager } = buildSession(address, expected);
-    const signatures: Record<string, SessionSignature> = {
-        [address]: {
+    const signatures: SessionSignature[] = [ {
+            address,
             signature: expectedSignature,
             signedOn: DateTime.now().toISO() || "",
             type: signatureType,
         }
-    };
+    ];
 
     if(validSignature) {
         const signedSession = await sessionManager.signedSessionOrThrow(session, signatures);

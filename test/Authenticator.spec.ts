@@ -17,15 +17,16 @@ describe('Authenticator', () => {
     it('generates a token for user', async () => {
         const authenticationService = new Authenticator(buildConfig());
         const signedSession = new Mock<SignedSession>();
-        signedSession.setup(instance => instance.signatures).returns({
-            [ USER_ADDRESS ]: {
+        signedSession.setup(instance => instance.signatures).returns([
+            {
+                address: USER_ADDRESS,
                 signature: "0x2c88db66ecf845896e1ba4c9fd02ebcb5ab5b84007b45edca6f0836007763c3fb1239824f07372dd41696e1f6558a700cd2c1a7b15fdb06e2041dd3b9878b988",
                 signedOn: DateTime.now().toISO() || "",
                 type: "POLKADOT"
-        }});
+        }]);
         const actual = await authenticationService.createTokens(signedSession.object(), DateTime.fromSeconds(1631217611));
-        expect(actual[USER_ADDRESS].value).toBe(USER_TOKEN);
-        expect(actual[USER_ADDRESS].expiredOn.toSeconds()).toBe(DateTime.fromSeconds(1631217611 + TTL).toSeconds());
+        expect(actual[0].value).toBe(USER_TOKEN);
+        expect(actual[0].expiredOn.toSeconds()).toBe(DateTime.fromSeconds(1631217611 + TTL).toSeconds());
     })
 
     it('authenticates user based on token', async () => {
