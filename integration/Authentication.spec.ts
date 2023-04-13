@@ -56,15 +56,15 @@ async function authenticate(args: { address: string, sessionManager: SessionMana
         signedOn,
         attributes: [ session.id ],
     });
-    const signatures: Record<string, SessionSignature> = {
-        [ address ]: {
+    const signatures: SessionSignature[] = [ {
+            address,
             signature: typedSignature.signature,
             signedOn: toIsoString(signedOn),
             type: "POLKADOT",
         }
-    };
+    ];
     const signedSession = await sessionManager.signedSessionOrThrow(session, signatures);
 
     const tokens = await authenticator.createTokens(signedSession, DateTime.now());
-    return authenticator.ensureAuthenticatedUserOrThrow(tokens[address].value);
+    return authenticator.ensureAuthenticatedUserOrThrow(tokens[0].value);
 }

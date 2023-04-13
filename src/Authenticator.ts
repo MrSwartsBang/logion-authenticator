@@ -10,23 +10,21 @@ import { AuthenticatedUser, Address, AddressType } from "./AuthenticatedUser.js"
 import { SignedSession } from "./Session.js";
 import { SignatureType } from "./Signature.js";
 
-export interface Token {
+export interface Token extends Address {
     readonly value: string;
     readonly expiredOn: DateTime;
 }
 
 export class Authenticator {
 
-    async createTokens(signedSession: SignedSession, issuedAt: DateTime): Promise<Record<string, Token>> {
-        const tokens: Record<string, Token> = {};
-        const addresses = Object.keys(signedSession.signatures);
-        for(const addressValue of addresses) {
-            const sessionSignature = signedSession.signatures[addressValue];
+    async createTokens(signedSession: SignedSession, issuedAt: DateTime): Promise<Token[]> {
+        const tokens: Token[] = [];
+        for (const sessionSignature of signedSession.signatures) {
             const address: Address = {
                 type: this.toAddressType(sessionSignature.type),
-                address: addressValue
+                address: sessionSignature.address
             }
-            tokens[addressValue] = await this._createToken(address, issuedAt);
+            tokens.push(await this._createToken(address, issuedAt));
         }
         return tokens;
     }
@@ -45,6 +43,7 @@ export class Authenticator {
             .setSubject(address.address)
             .sign(this.privateKey);
         return {
+            ...address,
             value: encodedToken,
             expiredOn: DateTime.fromSeconds(expiredOn),
         };
