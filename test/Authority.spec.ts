@@ -1,4 +1,5 @@
 import { Mock } from "moq.ts";
+import { ApiPromise } from "@polkadot/api";
 import { Bytes, Enum, Option, Struct } from "@polkadot/types-codec";
 import { Codec } from "@polkadot/types-codec/types";
 import type { AccountId32 } from '@polkadot/types/interfaces/runtime';
@@ -6,7 +7,7 @@ import PeerId, { createFromB58String } from "peer-id";
 import { AccountId, OpaquePeerId } from "@logion/node-api/dist/types/interfaces";
 
 import { PolkadotAuthorityService } from "../src/index.js";
-import { LogionNodeApi } from "@logion/node-api";
+import { LogionNodeApiClass } from "@logion/node-api";
 
 // Below definitions must be removed once @logion/node-api is switched to ES module packaging
 interface PalletLoAuthorityListLegalOfficerData extends Enum {
@@ -91,8 +92,8 @@ describe("PolkadotAuthorityService", () => {
     })
 })
 
-function mockPolkadotServiceWithLegalOfficer(hosts: Record<string, string>, wellKnownNodes: string[], guests: Record<string, string>): LogionNodeApi {
-    const apiMock: unknown = {
+function mockPolkadotServiceWithLegalOfficer(hosts: Record<string, string>, wellKnownNodes: string[], guests: Record<string, string>): LogionNodeApiClass {
+    const apiMock = {
         query: {
             loAuthorityList: {
                 legalOfficerSet: (address: string | AccountId) =>
@@ -104,9 +105,8 @@ function mockPolkadotServiceWithLegalOfficer(hosts: Record<string, string>, well
                 wellKnownNodes: () => new Set<OpaquePeerId>(wellKnownNodes.map(toOpaquePeerId)),
             },
         }
-    };
-
-    return apiMock as LogionNodeApi;
+    } as unknown as ApiPromise;
+    return new LogionNodeApiClass(apiMock);
 }
 
 function mockHost(nodeId: string): PalletLoAuthorityListLegalOfficerData {
