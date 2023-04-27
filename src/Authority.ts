@@ -1,4 +1,4 @@
-import { LogionNodeApi } from '@logion/node-api';
+import { LogionNodeApiClass } from '@logion/node-api';
 import { OpaquePeerId } from "@logion/node-api/dist/types/interfaces";
 import PeerId from 'peer-id';
 
@@ -6,22 +6,22 @@ import { AuthorityService } from './Config.js';
 
 export class PolkadotAuthorityService implements AuthorityService {
 
-    constructor(connectedApi: LogionNodeApi, nodeId: PeerId) {
+    constructor(connectedApi: LogionNodeApiClass, nodeId: PeerId) {
         this.api = connectedApi;
         this.nodeId = nodeId;
     }
 
-    private api: LogionNodeApi;
+    private api: LogionNodeApiClass;
 
     private readonly nodeId: PeerId;
 
     async isLegalOfficer(address: string): Promise<boolean> {
-        const entry = await this.api.query.loAuthorityList.legalOfficerSet(address);
+        const entry = await this.api.polkadot.query.loAuthorityList.legalOfficerSet(address);
         return entry.isSome;
     }
 
     async isLegalOfficerOnNode(address: string): Promise<boolean> {
-        const entry = await this.api.query.loAuthorityList.legalOfficerSet(address);
+        const entry = await this.api.polkadot.query.loAuthorityList.legalOfficerSet(address);
         if(!entry.isSome) {
             return false;
         } else {
@@ -30,7 +30,7 @@ export class PolkadotAuthorityService implements AuthorityService {
                 return this.toHex(this.nodeId) === legalOfficer.asHost.nodeId.unwrap().toHex();
             } else if(legalOfficer.isGuest) {
                 const hostAddress = legalOfficer.asGuest;
-                const host = await this.api.query.loAuthorityList.legalOfficerSet(hostAddress);
+                const host = await this.api.polkadot.query.loAuthorityList.legalOfficerSet(hostAddress);
                 if(host.isSome && host.unwrap().isHost && host.unwrap().asHost.nodeId.isSome) {
                     return this.toHex(this.nodeId) === host.unwrap().asHost.nodeId.unwrap().toHex();
                 } else {
@@ -48,8 +48,8 @@ export class PolkadotAuthorityService implements AuthorityService {
 
     async isLegalOfficerNode(peerId: PeerId): Promise<boolean> {
         const hexPeerId = this.toHex(peerId);
-        const legalOfficerNodes = await this.api.query.loAuthorityList.legalOfficerNodes();
-        const wellKnowNodes = await this.api.query.nodeAuthorization.wellKnownNodes();
+        const legalOfficerNodes = await this.api.polkadot.query.loAuthorityList.legalOfficerNodes();
+        const wellKnowNodes = await this.api.polkadot.query.nodeAuthorization.wellKnownNodes();
         return this.isInSet(hexPeerId, legalOfficerNodes) || this.isInSet(hexPeerId, wellKnowNodes);
     }
 

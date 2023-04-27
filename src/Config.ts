@@ -1,4 +1,4 @@
-import { LogionNodeApi } from "@logion/node-api";
+import { LogionNodeApiClass } from "@logion/node-api";
 import { Duration } from "luxon";
 import PeerId from "peer-id";
 import { Authenticator } from "./Authenticator.js";
@@ -34,7 +34,7 @@ export function defaultErrorFactory(): ErrorFactory {
     };
 }
 
-export function defaultAuthorityService(api: LogionNodeApi, nodeId: PeerId): AuthorityService {
+export function defaultAuthorityService(api: LogionNodeApiClass, nodeId: PeerId): AuthorityService {
     return new PolkadotAuthorityService(api, nodeId);
 }
 
@@ -52,7 +52,7 @@ export function defaultSignatureServices(): Record<SignatureType, SignatureServi
 }
 
 export function defaultSetup(args: {
-    api: LogionNodeApi,
+    api: LogionNodeApiClass,
     tokenConfig: TokenConfig,
     errorFactory?: ErrorFactory,
 }): AuthenticationSystem {
