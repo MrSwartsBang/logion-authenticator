@@ -34,8 +34,8 @@
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
-    "@logion/client": "^0.24.0-3",
-    "@logion/node-api": "^0.13.0-6",
+    "@logion/client": "^0.25.0-4",
+    "@logion/node-api": "^0.14.0-5",
     "@tsconfig/node16": "^1.0.3",
     "@types/jasmine": "^4.0.3",
     "@types/node": "^18.6.2",
