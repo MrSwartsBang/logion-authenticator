@@ -1,6 +1,17 @@
 import { DateTime } from "luxon";
 import { It, Mock } from "moq.ts";
-import { defaultErrorFactory, EthereumSignatureService, PolkadotSignatureService, Session, SessionManager, SessionSignature, SignatureService, SignatureType, VerifyParams } from "../src/index.js";
+import {
+    defaultErrorFactory,
+    EthereumSignatureService,
+    PolkadotSignatureService,
+    Session,
+    SessionManager,
+    SessionSignature,
+    SignatureService,
+    SignatureType,
+    VerifyParams,
+    MultiversxSignatureService
+} from "../src/index.js";
 
 const polkadotAddress = "5DPLBrBxniGbGdFe1Lmdpkt6K3aNjhoNPJrSJ51rwcmhH2Tn";
 const ethereumAddress = "0x6ef154673a6379b2CDEDeD6aF1c0d705c3c8272a";
@@ -53,6 +64,7 @@ function mockSignatureServices(): Record<SignatureType, Mock<SignatureService>> 
         ETHEREUM: new Mock<EthereumSignatureService>(),
         POLKADOT: new Mock<PolkadotSignatureService>(),
         CROSSMINT_ETHEREUM: new Mock<PolkadotSignatureService>(),
+        MULTIVERSX: new Mock<MultiversxSignatureService>(),
     };
 }
 
@@ -61,6 +73,7 @@ function buildSessionManagerWithMocks(signatureServices: Record<SignatureType, M
         ETHEREUM: signatureServices.ETHEREUM.object(),
         POLKADOT: signatureServices.POLKADOT.object(),
         CROSSMINT_ETHEREUM: signatureServices.CROSSMINT_ETHEREUM.object(),
+        MULTIVERSX: signatureServices.MULTIVERSX.object(),
     } });
 }
 
@@ -70,6 +83,7 @@ async function testSignedSessionOrThrow(signatureType: SignatureType, address: s
         ETHEREUM: undefined,
         POLKADOT: undefined,
         CROSSMINT_ETHEREUM: undefined,
+        MULTIVERSX: undefined,
     };
     expected[signatureType] = {
         address,

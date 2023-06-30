@@ -1,5 +1,13 @@
 import { It, Mock } from "moq.ts";
-import { CrossmintSignatureService, EthereumSignatureService, PolkadotSignatureService, SignatureService, VerifyFunction, VerifyFunctionParams } from "../src/index.js";
+import {
+    CrossmintSignatureService,
+    EthereumSignatureService,
+    PolkadotSignatureService,
+    SignatureService,
+    VerifyFunction,
+    VerifyFunctionParams,
+    MultiversxSignatureService
+} from "../src/index.js";
 
 describe('SignatureService', () => {
 
@@ -160,6 +168,33 @@ describe("CrossmintSignatureService", () => {
         expect(await signatureService.verify({
             ...params,
             signature: "0x8807227a68aecb8012994fa6197b36ffa50fe8510edb6ce3f78073deed022da05c272ec6f330f67b1fe6729eb3b66129daa506c18e8ab5eec96b8420711150b61c",
+        })).toBeFalse();
+    })
+});
+
+describe("MultiversxSignatureService", () => {
+
+    const params = {
+        address: "erd1urwqlj8rp3xlpqvu7stcsjsxyhs3skgy0exvly3hr7g92yjeey3sqpvkyx",
+        resource: "authentication",
+        operation: "login",
+        timestamp: "2023-06-30T17:03:36.606+02:00",
+        attributes: [ "f7cdd2dd-3dfc-438c-a4a5-ea7a945f5c54" ]
+    };
+
+    const signatureService = new MultiversxSignatureService();
+
+    it("verifies valid signature", async () => {
+        expect(await signatureService.verify({
+            ...params,
+            signature: "0xacc3df4c471b3d1604c3b1a284997f03bceee6255f5583e4cb843d2ab9068dee5ce60dccd5d27eb450b5fa737d231d57f068a792ef9d686d0c88e07b26f9a908",
+        })).toBeTrue();
+    })
+
+    it("fails to verify invalid signature", async () => {
+        expect(await signatureService.verify({
+            ...params,
+            signature: "0x8807227a68aecb8012994fa6197b36ffa50fe8510edb6ce3f78073deed022da05c272ec6f330f67b1fe6729eb3b66129daa506c18e8ab5eec96b8420711150b6",
         })).toBeFalse();
     })
 });

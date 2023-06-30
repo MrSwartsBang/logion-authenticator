@@ -5,8 +5,11 @@ import { waitReady } from "@polkadot/wasm-crypto";
 import crypto from 'crypto';
 import web3Util from "web3-utils";
 import { ethers } from "ethers";
+import { SignableMessage } from "@multiversx/sdk-core";
+import { UserVerifier } from "@multiversx/sdk-wallet";
+import { UserAddress } from "@multiversx/sdk-wallet/out/userAddress.js";
 
-export type SignatureType = "ETHEREUM" | "POLKADOT" | "CROSSMINT_ETHEREUM";
+export type SignatureType = "ETHEREUM" | "POLKADOT" | "CROSSMINT_ETHEREUM" | "MULTIVERSX";
 
 export interface VerifyParams {
     signature: string;
@@ -127,5 +130,22 @@ export class CrossmintSignatureService extends SignatureService {
         const digest = ethers.utils.hashMessage(hexMessage);
         const recoveredAddress = recoverAddress(digest, signature);
         return Promise.resolve(recoveredAddress.toLowerCase() === address.toLowerCase());
+    }
+}
+
+export class MultiversxSignatureService extends SignatureService {
+
+    constructor() {
+        super(MultiversxSignatureService.verify);
+    }
+
+    private static async verify(params: VerifyFunctionParams): Promise<boolean> {
+        const { message, address } = params;
+        const verifier = UserVerifier.fromAddress(UserAddress.fromBech32(address));
+        const serializedMessage = new SignableMessage({
+            message: Buffer.from(message)
+        }).serializeForSigning();
+        const signature = Buffer.from(params.signature.substring(2), "hex"); // Prefix "0x" dropped
+        return verifier.verify(serializedMessage, signature);
     }
 }
