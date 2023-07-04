@@ -52,7 +52,9 @@ export class Authenticator {
     private toAddressType(signatureType: SignatureType): AddressType {
         if (signatureType === "POLKADOT") {
             return "Polkadot";
-        } else {
+        } else if (signatureType === "MULTIVERSX") {
+            return "Bech32";
+        } else { // *ETHEREUM
             return "Ethereum";
         }
     }
@@ -90,11 +92,17 @@ export class Authenticator {
         if (!address) {
             throw this.config.errorFactory.unauthorized("Unable to find issuer in payload");
         }
-        const type = payload.addressType === "Polkadot" ? "Polkadot" : "Ethereum";
         return {
             address,
-            type,
+            type: this.validAddressTypeOrThrow(payload.addressType),
         }
+    }
+
+    validAddressTypeOrThrow(addressType: unknown): AddressType {
+        if (addressType === "Polkadot" || addressType === "Ethereum" || addressType === "Bech32") {
+            return addressType;
+        }
+        throw this.config.errorFactory.unauthorized("Unable to find supported address type in payload");
     }
 
     async refreshToken(jwtToken: string): Promise<Token> {

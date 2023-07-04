@@ -4,7 +4,14 @@ import PeerId from "peer-id";
 import { Authenticator } from "./Authenticator.js";
 import { PolkadotAuthorityService } from "./Authority.js";
 import { SessionManager } from "./Session.js";
-import { CrossmintSignatureService, EthereumSignatureService, PolkadotSignatureService, SignatureService, SignatureType } from "./Signature.js";
+import {
+    CrossmintSignatureService,
+    EthereumSignatureService,
+    PolkadotSignatureService,
+    SignatureService,
+    SignatureType,
+    MultiversxSignatureService
+} from "./Signature.js";
 
 export interface TokenConfig {
     readonly nodeOwner: string;
@@ -48,6 +55,7 @@ export function defaultSignatureServices(): Record<SignatureType, SignatureServi
         ETHEREUM: new EthereumSignatureService(),
         POLKADOT: new PolkadotSignatureService(),
         CROSSMINT_ETHEREUM: new CrossmintSignatureService(),
+        MULTIVERSX: new MultiversxSignatureService(),
     };
 }
 
